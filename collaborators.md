@@ -16,9 +16,9 @@ This file outlines the team members and their roles in the project.
 
 The following members contributed to specific areas of the project:
 
-1. **[Member Name 1]**  
-   - **GitHub:** [GitHub Username]  
-   - **Email:** [Email Address]  
+1. **Mohammed Salah**  
+   - **GitHub:** github.com/med260  
+   - **Email:** medos80268026@gmail.com  
    <!-- - **Role:**    -->
    <!-- - **Responsibilities:**  -->
 
