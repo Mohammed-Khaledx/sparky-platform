@@ -81,3 +81,18 @@ exports.login = async (req, res) => {
     });
   }
 };
+
+
+// Get current user
+exports.getCurrentUser = async (req, res) => {
+  try {
+      // extract id from te auth middelware which mean token
+      const user = await User.findById(req.user.userId).select('-password');
+      if (!user) {
+        return res.status(404).json({ message: "User not found." });
+      }
+      res.json(user);
+  } catch (error) {
+      res.status(500).json({ message: 'Error getting user', error: error.message });
+  }
+};

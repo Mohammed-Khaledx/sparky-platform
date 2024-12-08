@@ -31,17 +31,33 @@ let getAllUsers = async (req, res) => {
   }
 };
 
-let getUserByName = async (req, res) => {
+// not needed
+// let getUserByName = async (req, res) => {
+//   try {
+//     let name = req.params.name;
+//     const wantedUser = await User.findOne({ name: req.params.name });
+//     if (!wantedUser) {
+//       return res.status(404).json({
+//         status: "error",
+//         message: "User not found",
+//       });
+//     }
+//     res.status(200).json(wantedUser);
+//   } catch (error) {
+//     res.status(500).json(error.message);
+//   }
+// };
+
+let getUserById = async (req, res) => {
   try {
-    let name = req.params.name;
-    const wantedUser = await User.findOne({ name: req.params.name });
-    if (!wantedUser) {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) {
       return res.status(404).json({
         status: "error",
         message: "User not found",
       });
     }
-    res.status(200).json(wantedUser);
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json(error.message);
   }
@@ -49,25 +65,24 @@ let getUserByName = async (req, res) => {
 
 // UPDATE
 let updateUser = async (req, res) => {
+  // req has the data of the logged in user from auth middelware
+
+  const { userId } = req.user; // Extract user ID from auth middleware
+  if (req.params.id !== userId) {
+    return res
+      .status(403)
+      .json({ message: "You can only update your own profile" });
+  }
+
   try {
-    let selectedUser = req.params.name;
-    let newData = req.body;
-    const newUser = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      // option object that true for return the new object
-      // and run the validation throw the schema
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-    if (!newUser) {
-      throw new Error("User not found");
-    }
-    res.status(200).json(newUser);
+      { $set: req.body }, // Allow updating multiple fields
+      { new: true }
+    ).select("-password");
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -87,7 +102,7 @@ let deleteUser = async (req, res) => {
 module.exports = {
   createUser,
   getAllUsers,
-  getUserByName,
+  getUserById,
   updateUser,
   deleteUser,
 };
