@@ -2,16 +2,24 @@ const User = require("../models/user_model");
 const jwt = require("jsonwebtoken");
 console.log('Secret Key:', process.env.JWT_SECRET); // Ensure it is not undefined
 // Generate JWT Token
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
+const generateToken = (userId ,isAdmin) => {
+  try {
+    
+    return jwt.sign({ userId , isAdmin}, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+  } catch (error) {
+    console.error('Token generation error:', error);
+
+    throw new Error('Token generation failed');
+
+  }
 };
 
 // Register User
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password ,isAdmin} = req.body;
 
     // Check if user already exists
     let existingUser = await User.findOne({
@@ -29,12 +37,15 @@ exports.register = async (req, res) => {
       name,
       email,
       password,
+      isAdmin,
     });
 
     await user.save();
 
+
+
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id , user.isAdmin);
 
     res.status(201).json({
       message: "User registered successfully",
@@ -67,7 +78,7 @@ exports.login = async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id , user.isAdmin);
 
     res.json({
       message: "Login successful",

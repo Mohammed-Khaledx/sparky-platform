@@ -11,10 +11,11 @@ const {
 } = require("../controllers/user_controle");
 const { register, login , getCurrentUser } = require("../controllers/auth_controller");
 const auth = require("../middlewares/auth")
+const authAdmin = require("../middlewares/authAdmin")
 
 // just the admin role can access
-// user_route.get("/", getAllUsers);
-// user_route.delete("/:id", deleteUser);
+user_route.get("/",auth,authAdmin, getAllUsers);
+user_route.delete("/:id",auth,authAdmin, deleteUser);
 
 
 
