@@ -45,6 +45,10 @@ app.use(express.json());
 const user_route = require("./routes/userRoute");
 app.use("/users", user_route);
 
+
+const followOrUnfollow_Route = require("./routes/followOrUnfollowRoute");
+app.use("/followOrUnfollow", followOrUnfollow_Route);
+
 const post_route = require("./routes/postRoute");
 app.use("/posts", post_route);
 
@@ -73,4 +77,3 @@ app.use((err, req, res, next) => {
 // then go to the route then import express to use the requests [get ,post]
 //
 
-console.log('Secret Key:', process.env.JWT_SECRET); // Ensure it is not undefined
