@@ -53,6 +53,10 @@ const post_route = require("./routes/postRoute");
 app.use("/posts", post_route);
 
 
+const notification_route = require("./routes/notificationRoute");
+app.use("/notifications", notification_route);
+
+
 
 // 404 Not Found Middleware
 app.use((req, res, next) => {

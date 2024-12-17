@@ -1,5 +1,6 @@
 const Post = require('../models/post_model');
 const User = require('../models/user_model');
+const Notification = require('../models/notification_model')
 
 // Create a new post
 exports.createPost = async (req, res) => {
@@ -75,7 +76,17 @@ exports.sparkPost = async (req, res) => {
     // Repopulate sparks with user details
     await post.populate('sparks', 'name profilePicture');
 
-    res.json(post);
+    
+    await Notification.create({
+      recipient: post.author, // Post owner's ID
+      sender: req.user.userId,
+      type: "spark",
+      message: "sparked your post.",
+      target: Post._id,
+      targetModel: "Post",
+    });
+
+    res.status(201).json({message : "sparked successfully"});
   } catch (error) {
     res.status(400).json({ message: 'Error sparking post', error: error.message });
   }
@@ -105,7 +116,16 @@ exports.addComment = async (req, res) => {
       select: 'name profilePicture'
     });
 
-    res.json(post.comments);
+    await Notification.create({
+      recipient: Post.author, // Post owner's ID
+      sender: req.user.userId,
+      type: "comment",
+      message: "commented on your post.",
+      target: Post.id,
+      targetModel: "Post",
+    });
+
+    res.status(201).json({message : "Comment added successfully"});
   } catch (error) {
     res.status(400).json({ message: 'Error adding comment', error: error.message });
   }
