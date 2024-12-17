@@ -61,12 +61,12 @@ exports.getFollowersOrFollowing = async (req, res) => {
     if (type === "followers") {
       relationships = await Follow.find({ following: userId }).populate(
         "follower",
-        "username profilePicture"
+        "name email"
       );
     } else if (type === "following") {
       relationships = await Follow.find({ follower: userId }).populate(
         "following",
-        "username profilePicture"
+        "name email"
       );
     } else {
       return res.status(400).json({ message: "Invalid type parameter." });
@@ -74,7 +74,7 @@ exports.getFollowersOrFollowing = async (req, res) => {
 
     res.status(200).json({ data: relationships });
   } catch (error) {
-    res.status(500).json({ message: "Server error." });
+    res.status(500).json({ error:  error.message });
   }
 };
 
