@@ -4,6 +4,8 @@
 // const mongoose = require("mongoose");
 
 const User = require("../models/user_model");
+const Follow = require("../models/follow_model");
+
 
 // CREATE
 let createUser = async (req, res) => {
@@ -57,7 +59,17 @@ let getUserById = async (req, res) => {
         message: "User not found",
       });
     }
-    res.status(200).json(user);
+
+    // Fetch follow data and return the count of follwers and following
+    const followersCount = await Follow.countDocuments({ following: id });
+    const followingCount = await Follow.countDocuments({ follower: id });
+
+
+    res.status(200).json({
+      user,
+      followersCount,
+      followingCount,
+    });
   } catch (error) {
     res.status(500).json(error.message);
   }
