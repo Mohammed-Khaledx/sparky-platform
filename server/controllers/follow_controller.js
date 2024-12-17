@@ -1,4 +1,6 @@
 const Follow = require("../models/follow_model");
+const Notification = require('../models/notification_model')
+
 
 exports.followUser = async (req, res) => {
   try {
@@ -20,9 +22,19 @@ exports.followUser = async (req, res) => {
 
     // Create follow relationship
     await Follow.create({ follower: userId, following: followId });
+
+    // Create a notification
+    await Notification.create({
+      recipient: followId,
+      sender: userId,
+      type: "follow",
+      message: "started following you.",
+      target: null,
+      targetModel: null,
+    });
     res.status(200).json({ message: "Followed successfully." });
   } catch (error) {
-    res.status(500).json({ message: "Server error." });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -74,7 +86,7 @@ exports.getFollowersOrFollowing = async (req, res) => {
 
     res.status(200).json({ data: relationships });
   } catch (error) {
-    res.status(500).json({ error:  error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
