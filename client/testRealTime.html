@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket.IO Test</title>
+</head>
+<body>
+  <script type="module">
+    import io from "https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.esm.min.js"; // Use the ESM build
+
+    const socket = io('http://localhost:3000'); // Replace with your server URL
+
+    socket.on('connect', () => {
+      console.log('Connected!', socket.id);
+      socket.emit('register', "testUser123"); // Emit the register event
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected!');
+    });
+  </script>
+</body>
+</html>

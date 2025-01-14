@@ -1,6 +1,17 @@
 const Follow = require("../models/follow_model");
 const Notification = require('../models/notification_model')
 
+const socketIo = require("socket.io")
+
+const express = require("express")
+const http = require("http")
+
+const app = express();
+
+const server = http.createServer(app); // Attach HTTP server
+
+const io = socketIo(server)
+
 
 exports.followUser = async (req, res) => {
   try {
@@ -32,9 +43,24 @@ exports.followUser = async (req, res) => {
       target: null,
       targetModel: null,
     });
+
+
+
+        // Send notification in real-time if recipient is online
+        // As active users is {userid : user-socketid} and carry all currently connected 
+        const recipientSocket = activeUsers[followId];
+        if (recipientSocket) {
+          // emitting to specific user with its socket id
+          io.to(recipientSocket).emit("newNotification", {
+            sender: userId,
+            message: "started following you.",
+            notification,
+          });
+        }
     res.status(200).json({ message: "Followed successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
+    
   }
 };
 
