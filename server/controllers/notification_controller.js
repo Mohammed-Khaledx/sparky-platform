@@ -1,11 +1,12 @@
 const Notification = require("../models/notification_model");
 
+
 exports.getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({ recipient: req.user.userId })
-    //   .sort({ createdAt: -1 })
-    //   .populate("sender", "name") // Show sender details
-    //   .lean();
+      .sort({ createdAt: -1 })
+      .populate("sender", "name") // Show sender details
+      .lean();
 
     res.status(200).json({ notifications });
   } catch (err) {

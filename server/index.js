@@ -1,27 +1,19 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const app = express();
+const mongoose = require("mongoose");
 const cors = require("cors");
+
 
 const http = require("http"); // Required for creating a server
 const server = http.createServer(app);
-
-const { initializeSocket } = require("./socket");
+const { initializeSocket } = require("./socket/socket");
 const io = initializeSocket(server);
 
+module.exports = {io};
 
 
 
-// const { Server } = require("socket.io");
 
-// const io = new Server(server, {
-//   cors: {
-//     origin: "*",
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   },
-
-// });
 require("dotenv").config();
 
 app.use(cors());
@@ -39,28 +31,16 @@ app.get("/status", (req, res) => {
   });
 });
 
-
-
-
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-
-
-
-
-
 // Debug events
-io.engine.on('connection_error', (err) => {
-  console.log('Connection Error:', err);
+io.engine.on("connection_error", (err) => {
+  console.log("Connection Error:", err);
 });
-
-
-
-
 
 // this is listening for the user connect from the frontend
 // io.on("connection", (socket) => {
@@ -93,7 +73,6 @@ io.engine.on('connection_error', (err) => {
 //     }
 //   });
 // });
-
 
 
 async function mongoConnect() {
@@ -143,4 +122,3 @@ app.use((err, req, res, next) => {
 
 // from server connect to routes throw specific route path "./path"
 // then go to the route then import express to use the requests [get ,post]
-

@@ -1,16 +1,20 @@
 const Follow = require("../models/follow_model");
 const Notification = require('../models/notification_model')
+// const express = require("express");
+// const app = express();
+// const http = require("http"); // Required for creating a server
+// const server = http.createServer(app);
+// const { initializeSocket } = require("../socket/socket");
 
-const socketIo = require("socket.io")
+// const  io = initializeSocket(server)
 
-const express = require("express")
-const http = require("http")
 
-const app = express();
+const { io } = require('../index'); // Import the io instance
+const {emitToUser} = require("../socket/socket")
 
-const server = http.createServer(app); // Attach HTTP server
+// const server = http.createServer(app); // Attach HTTP server
 
-const io = socketIo(server)
+// const io = socketIo(server)
 
 
 exports.followUser = async (req, res) => {
@@ -48,15 +52,18 @@ exports.followUser = async (req, res) => {
 
         // Send notification in real-time if recipient is online
         // As active users is {userid : user-socketid} and carry all currently connected 
-        const recipientSocket = activeUsers[followId];
-        if (recipientSocket) {
-          // emitting to specific user with its socket id
-          io.to(recipientSocket).emit("newNotification", {
-            sender: userId,
-            message: "started following you.",
-            notification,
-          });
-        }
+        // const recipientSocket = activeUsers[followId];
+        // if (recipientSocket) {
+        //   // emitting to specific user with its socket id
+        //   io.to(recipientSocket).emit("newNotification", {
+        //     sender: userId,
+        //     message: "started following you.",
+        //     notification,
+        //   });
+        // }
+        console.log(io)
+        emitToUser(followId, "notification", "started following you" ,io);
+
     res.status(200).json({ message: "Followed successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
