@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO Test</title>
+  </head>
+  <body>
+    <script type="module">
+      // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzg1NzBmNzNhNWMzYmJmMjdjNDFiZmQiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzM2OTU4OTM0LCJleHAiOjE3MzcwNDUzMzR9.YoTqN8857VAaDnhI387Xjr_IyTyxxFY9mCDZKoFu858
+      import io from "https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.esm.min.js"; // Use the ESM build
+      const token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzk2NjNhZjg4MDc0OGIwMzI4NzY2OGMiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzM3OTA5MTY4LCJleHAiOjE3Mzc5OTU1Njh9.LQiH6ivsKh5NJZt1cS9ycrq3l6kei8x8g6kqAj_LJrw";
+      const socket = io("http://localhost:3000", {
+        auth: { token },
+      }); // Replace with your server URL
+
+      socket.on("connect", () => {
+        console.log("Connected!", socket.id);
+        socket.emit("register", "testUser123"); // Emit the register event
+      });
+
+      // Listen for notifications
+      socket.on("notification", (data) => {
+        console.log("New notification received:", data);
+        // Add some visual feedback
+        const notification = document.createElement("div");
+        notification.textContent = `New notification: ${data}`;
+        document.body.appendChild(notification);
+      });
+      socket.on("disconnect", () => {
+        console.log("Disconnected!");
+      });
+    </script>
+  </body>
+</html>

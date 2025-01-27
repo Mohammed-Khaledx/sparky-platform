@@ -7,6 +7,7 @@ const followSchema = new mongoose.Schema({
 
 // Ensure uniqueness of follower-following pairs 
 // this mean there no reapeated rows
+
 // adding indexing: indexing is ultra fast while try to findOne with mongo
 // wich is in normal mongo witout undexing will iterate all over the data 
 // but if index it could access it directlt 

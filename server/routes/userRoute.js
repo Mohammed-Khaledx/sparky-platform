@@ -14,8 +14,8 @@ const auth = require("../middlewares/auth")
 const authAdmin = require("../middlewares/authAdmin")
 
 // just the admin role can access
-user_route.get("/",auth,authAdmin, getAllUsers);
-user_route.delete("/:id",auth,authAdmin, deleteUser);
+user_route.get("/",auth, authAdmin, getAllUsers);
+user_route.delete("/:id",auth, authAdmin, deleteUser);
 
 
 
@@ -30,7 +30,7 @@ user_route.get("/:id" , getUserById)
 
 
 // this should be protected by auth
-user_route.patch("/:id", auth,updateUser);
+user_route.patch("/:id", auth ,updateUser);
 
 
 

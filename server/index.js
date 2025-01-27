@@ -1,32 +1,85 @@
 const express = require("express");
+const app = express();
 const mongoose = require("mongoose");
+const cors = require("cors");
+
+
+const http = require("http"); // Required for creating a server
+const server = http.createServer(app);
+const { initializeSocket } = require("./socket/socket");
+const io = initializeSocket(server);
+
+module.exports = {io};
+
+
+
+
 require("dotenv").config();
 
-const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static("public"));
 
-// Set view engine to Pug
-app.set("view engine", "pug");
-app.set("views", "./views");
+// For serving static files
 
-app.use(express.static("public")); // For serving static files
-
-
-const User = require('./models/user_model')
-app.get("/", async(req, res) => {
-  try {
-    const users = await User.find(); // Fetch all users from the database
-    console.log(users)
-    res.render('index', { title: 'User List', users }); // Pass users to the view
-} catch (err) {
-  console.error(err);
-  res.status(500).send('Server Error');
-}
+// Status route
+app.get("/status", (req, res) => {
+  res.json({
+    socketio: !!io,
+    connections: io.engine?.clientsCount || 0,
+    status: "running",
+  });
 });
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Debug events
+io.engine.on("connection_error", (err) => {
+  console.log("Connection Error:", err);
+});
+
+// this is listening for the user connect from the frontend
+// io.on("connection", (socket) => {
+//   console.log("A user connected:", socket.id);
+
+//   socket.on('error', (error) => {
+//     console.error('Socket error:', error);
+//   });
+
+//   // When a user authenticates, store their socket
+//   // and this is emmited from the front end after successfull sign-in
+//   socket.on("register", (userId) => {
+//     activeUsers[userId] = socket.id;
+//     console.log("Registered user:", userId, "Socket ID:", socket.id);
+//   });
+
+//   socket.on("message", (data) => {
+//     console.log("Received:", data);
+//     socket.emit("response", `Server received: ${data}`);
+//   });
+
+//   // Handle disconnection
+//   socket.on("disconnect", () => {
+//     const userId = Object.keys(activeUsers).find(
+//       (key) => activeUsers[key] === socket.id
+//     );
+//     if (userId) {
+//       delete activeUsers[userId];
+//       console.log(`User ${userId} disconnected`);
+//     }
+//   });
+// });
 
 
 async function mongoConnect() {
   try {
-    const state = await mongoose.connect("mongodb://127.0.0.1:27017/sparky_platfrom_db");
+    const state = await mongoose.connect(
+      "mongodb://127.0.0.1:27017/sparky_platfrom_db"
+    );
     console.log("db connected successfully");
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);
@@ -34,17 +87,10 @@ async function mongoConnect() {
 }
 mongoConnect();
 
-app.listen("3000", () => {
-  console.log("server started successfully");
-});
-
-// use the middelware
-app.use(express.json());
 
 // setup routes
 const user_route = require("./routes/userRoute");
 app.use("/users", user_route);
-
 
 const followOrUnfollow_Route = require("./routes/followOrUnfollowRoute");
 app.use("/followOrUnfollow", followOrUnfollow_Route);
@@ -52,11 +98,8 @@ app.use("/followOrUnfollow", followOrUnfollow_Route);
 const post_route = require("./routes/postRoute");
 app.use("/posts", post_route);
 
-
 const notification_route = require("./routes/notificationRoute");
 app.use("/notifications", notification_route);
-
-
 
 // 404 Not Found Middleware
 app.use((req, res, next) => {
@@ -79,5 +122,3 @@ app.use((err, req, res, next) => {
 
 // from server connect to routes throw specific route path "./path"
 // then go to the route then import express to use the requests [get ,post]
-//
-
