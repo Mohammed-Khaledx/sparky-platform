@@ -11,6 +11,8 @@ const {
 
 router.post('/', auth, createPost);
 router.get('/', auth, getAllPosts);
+
+// to get a post or view it you might not be sign in
 router.get('/:id', auth, getPostById);
 router.put('/spark/:id', auth, sparkPost);
 router.post('/comment/:id', auth, addComment);

@@ -81,7 +81,6 @@ const emitToUser = (userId, event, data) => {
   if (sockets.length > 0) {
     // more than one device
     sockets.forEach((socketid) => {
-      console.log("!!!!!!1",socketid)
       io.to(socketid).emit(event, data);
     });
   } else {
