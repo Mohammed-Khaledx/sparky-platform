@@ -1,15 +1,13 @@
 const Follow = require("../models/follow_model");
-const User  = require("../models/user_model")
-const Notification = require('../models/notification_model')
+const User = require("../models/user_model");
+const Notification = require("../models/notification_model");
 
-
-const { io } = require('../index'); // Import the io instance
-const {emitToUser} = require("../socket/socket")
+const { io } = require("../index"); // Import the io instance
+const { emitToUser } = require("../socket/socket");
 
 // const server = http.createServer(app); // Attach HTTP server
 
 // const io = socketIo(server)
-
 
 exports.followUser = async (req, res) => {
   try {
@@ -32,7 +30,7 @@ exports.followUser = async (req, res) => {
     // Create follow relationship
     await Follow.create({ follower: userId, following: followId });
 
-    const user = await User.findById(userId)
+    const user = await User.findById(userId);
 
     // Create a notification
     await Notification.create({
@@ -44,18 +42,19 @@ exports.followUser = async (req, res) => {
       targetModel: null,
     });
 
+    // Send notification in real-time if recipient is online
+    // As active users is {userid : user-socketid} and carry all currently connected
 
-
-        // Send notification in real-time if recipient is online
-        // As active users is {userid : user-socketid} and carry all currently connected 
-        
-        
-        emitToUser(followId, "notification", user.name +  " started following you" ,io);
+    emitToUser(
+      followId,
+      "notification",
+      user.name + " started following you",
+      io
+    );
 
     res.status(200).json({ message: "Followed successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
-    
   }
 };
 
