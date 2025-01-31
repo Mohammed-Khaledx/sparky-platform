@@ -1,6 +1,6 @@
 const Message = require("../models/Message");
 
-// in all of this function you may realize that
+// in all of this function you may notice that
 // all senderid is extrated from req.user.id
 // and all of this came from JWT auth middle-ware
 
