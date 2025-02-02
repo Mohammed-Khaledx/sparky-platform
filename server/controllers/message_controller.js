@@ -1,5 +1,10 @@
 const Message = require("../models/message_model");
 
+
+// socket io controller
+const { io } = require("../index"); // Import the io instance
+const { emitToUser } = require("../socket/socket");
+
 // in all of this function you may notice that
 // all senderid is extrated from req.user.userId
 // and all of this came from JWT auth middle-ware
@@ -22,9 +27,14 @@ const sendMessage = async (req, res) => {
 
     // Save message to database
     const newMessage = await Message.create({ sender, receiver, content });
+    // getting reciver name from user table and attaching it to the message content 
+    // const user = await User.findById(sender);
+
+    emitToUser(receiver, "message",  content, io);
     return res.status(201).json(newMessage);
+
   } catch (error) {
-    res.status(500).json({ error: "Failed to send message" });
+    res.status(500).json({ error: "Failed to send message"+ error });
   }
 };
 
