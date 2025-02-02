@@ -1,23 +1,27 @@
-const Message = require("../models/Message");
+const Message = require("../models/message_model");
 
-// in all of this function you may realize that
-// all senderid is extrated from req.user.id
+// in all of this function you may notice that
+// all senderid is extrated from req.user.userId
 // and all of this came from JWT auth middle-ware
+
+// Notice that the reciver here is extracted from the body
+// but we an have a diffrent way to do that by sending the reciver id
+// in the params
 
 // Send a message
 const sendMessage = async (req, res) => {
   try {
-    const { receiverId, message } = req.body;
-    const senderId = req.user.id; // Extract from JWT
+    const { receiver, content } = req.body;
+    const sender = req.user.userId; // Extract from JWT
 
-    if (!receiverId || !message) {
+    if (!receiver || !content) {
       return res
         .status(400)
         .json({ error: "Receiver ID and message are required" });
     }
 
     // Save message to database
-    const newMessage = await Message.create({ senderId, receiverId, message });
+    const newMessage = await Message.create({ sender, receiver, content });
     return res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ error: "Failed to send message" });
@@ -28,12 +32,12 @@ const sendMessage = async (req, res) => {
 const getMessages = async (req, res) => {
   try {
     const { otherUserId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const messages = await Message.find({
       $or: [
-        { senderId: userId, receiverId: otherUserId },
-        { senderId: otherUserId, receiverId: userId },
+        { sender: userId, receiver: otherUserId },
+        { sender: otherUserId, receiver: userId },
       ],
     }).sort({ createdAt: 1 });
 
@@ -43,21 +47,33 @@ const getMessages = async (req, res) => {
   }
 };
 
-// Update message status to "seen"
-const markMessagesAsSeen = async (req, res) => {
-  try {
-    const { senderId } = req.body;
-    const receiverId = req.user.id;
+// // Update message status to "seen"
+// const markMessagesAsSeen = async (req, res) => {
+//   try {
+//     const messageId = req.params;
 
-    await Message.updateMany(
-      { senderId, receiverId, read: false },
-      { read: true }
-    );
+//     // const { sender } = req.body;
+//     // const receiver = req.user.userId;
 
-    res.status(200).json({ message: "Messages marked as seen" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update message status" });
-  }
+//     const message = await Message.findOne({messageId})
+
+//     console.log(sender ,"  " , receiver )
+//     const sender = message.sender;
+//     const receiver = req.user.userId;
+
+//     await Message.updateMany(
+//       { sender, receiver, read: false },
+//       { read: true }
+//     );
+
+//     res.status(200).json({ message: "Messages marked as seen" });
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to update message status" });
+//   }
+// };
+
+module.exports = {
+  sendMessage,
+  getMessages,
+  // markMessagesAsSeen
 };
-
-module.exports = { sendMessage, getMessages, markMessagesAsSeen };
