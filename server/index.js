@@ -101,6 +101,9 @@ app.use("/posts", post_route);
 const notification_route = require("./routes/notificationRoute");
 app.use("/notifications", notification_route);
 
+const messageRoutes = require("./routes/messageRoute");
+app.use("/messages", messageRoutes);
+
 // 404 Not Found Middleware
 app.use((req, res, next) => {
   console.log(`404 Error: ${req.method} ${req.url} not found`); // Log before sending response

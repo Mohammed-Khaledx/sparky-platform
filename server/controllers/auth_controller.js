@@ -6,7 +6,7 @@ const generateToken = (userId ,isAdmin) => {
   try {
     
     return jwt.sign({ userId , isAdmin}, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "30d",// 30 daysfor testing purpose
     });
   } catch (error) {
     console.error('Token generation error:', error);
