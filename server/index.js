@@ -18,7 +18,14 @@ require("dotenv").config();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
+// app.use(express.static("public"));
+
+// new in express
+app.use(express.urlencoded({ extended: true })); // For parsing form data
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 
 // For serving static files
 
