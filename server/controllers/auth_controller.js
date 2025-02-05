@@ -34,11 +34,18 @@ exports.register = async (req, res) => {
 
     // Create new user
     const user = new User({
+      profilePicture: { url: "" },
       name,
       email,
       password,
       isAdmin,
     });
+
+    // saving the path of the image file
+    if (req.file) {
+      user.profilePicture = { url: req.file.path }; // Store the file path
+      console.log('File path:', req.file.path);
+    }
 
     await user.save();
 
