@@ -1,6 +1,7 @@
 const Post = require("../models/post_model");
 const User = require("../models/user_model");
 const Notification = require("../models/notification_model");
+const Follow = require("../models/follow_model")
 const mongoose = require("mongoose");
 
 const { io } = require("../index"); // Import the io instance
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
     cb(null, "post-" + uniqueSuffix + path.extname(file.originalname));
   },
 });
-
+// multer uploading middleware
 exports.postUpload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
@@ -289,5 +290,37 @@ exports.getUserPostStats = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching stats", error: error.message });
+  }
+};
+
+
+
+
+exports.getFeedPosts = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit; // Skips previous pages
+
+    // Get the list of followed user IDs
+    
+    const followedUsers = await Follow.find({ follower: req.user.userId }).select('following'); 
+    const followedIds = followedUsers.map(f => f.following); 
+
+    // Fetch posts from followed users with pagination
+    const posts = await Post.find({ author: { $in: followedIds } }) 
+      .sort({ createdAt: -1 })  // Newest posts first
+      .skip(skip) 
+      .limit(limit)  
+      .populate('author', 'name profilePicture') // Include user details
+      .populate({
+        path: 'comments.user',
+        select: 'name profilePicture'
+      })
+
+    return res.status(200).json({ success: true, posts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
