@@ -13,6 +13,8 @@ module.exports = {io};
 
 
 
+const path = require('path');
+app.use(express.urlencoded({ extended: true })); // For parsing form data
 
 require("dotenv").config();
 
@@ -21,8 +23,6 @@ app.use(express.json());
 // app.use(express.static("public"));
 
 // new in express
-app.use(express.urlencoded({ extended: true })); // For parsing form data
-const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 

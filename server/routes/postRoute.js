@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth');
 const {
+  postUpload,
   createPost,
   getAllPosts,
   sparkPost,
@@ -11,7 +12,7 @@ const {
   getUserPostStats
 } = require('../controllers/post_controller');
 
-router.post('/', auth, createPost);
+router.post('/', auth, postUpload.array("images" , 5), createPost);
 router.get('/', auth, getAllPosts);
 
 // to get a post or view it you might not be sign in
