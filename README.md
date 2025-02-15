@@ -1,5 +1,8 @@
 # Sparky Platform - Social Networking Backend
 
+Note : There is a rebranding and redesign for the platform you can view it [here](https://github.com/Mohammed-Khaledx/sparkly)
+
+
 [![Node.js](https://img.shields.io/badge/Node.js-16+-green)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.x-blue)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-4.4+-green)](https://www.mongodb.com/)
