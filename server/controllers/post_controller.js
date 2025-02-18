@@ -1,8 +1,11 @@
 const Post = require("../models/post_model");
 const User = require("../models/user_model");
 const Notification = require("../models/notification_model");
-const Follow = require("../models/follow_model")
+const Follow = require("../models/follow_model");
 const mongoose = require("mongoose");
+require("dotenv").config();
+const axios = require("axios");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const { io } = require("../index"); // Import the io instance
 const { emitToUser } = require("../socket/socket");
@@ -37,7 +40,14 @@ exports.postUpload = multer({
 exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
-    const images = req.files ? req.files.map((file) => file.path) : [];
+    const images = req.files
+      ? req.files.map(
+          (file) =>
+            `${req.protocol}://${req.get("host")}/uploads/posts/${
+              file.filename
+            }`
+        )
+      : [];
 
     const newPost = new Post({
       content,
@@ -46,8 +56,6 @@ exports.createPost = async (req, res) => {
     });
 
     const post = await newPost.save();
-
-    // Populate author details
     await post.populate("author", "name profilePicture");
 
     res.status(201).json(post);
@@ -154,6 +162,15 @@ exports.addComment = async (req, res) => {
     const { content } = req.body;
     const userId = req.user.userId;
 
+    const post = await Post.findById(req.params.id).populate(
+      "author",
+      "name profilePicture"
+    );
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
       {
@@ -167,38 +184,62 @@ exports.addComment = async (req, res) => {
         $inc: { commentCount: 1 },
       },
       { new: true }
-    );
+    ).populate("comments.user", "name profilePicture");
 
-    if (!updatedPost) {
-      return res.status(404).json({ message: "Post not found" });
+    const newComment = updatedPost.comments[updatedPost.comments.length - 1];
+
+    // Always create notification regardless of user's online status
+    if (post.author._id.toString() !== userId) {
+      const { name } = await User.findById(userId);
+
+      // Create notification in database first
+      await Notification.create({
+        recipient: post.author._id,
+        sender: userId,
+        type: "comment",
+        message: "commented on your post",
+        target: post._id,
+        targetModel: "Post",
+      });
+
+      // Attempt real-time delivery
+      emitToUser(post.author._id.toString(), "notification", {
+        type: "comment",
+        message: `${name} commented on your post`,
+        postId: post._id,
+      });
     }
-
-    // Create notification
-    await Notification.create({
-      recipient: updatedPost.author,
-      sender: userId,
-      type: "comment",
-      message: "commented on your post",
-      target: updatedPost._id,
-      targetModel: "Post",
-    });
-
-    const { name } = await User.findById(userId);
-    emitToUser(
-      updatedPost.author.toJSON(),
-      "notification",
-      name + " commented on your post",
-      io
-    );
 
     res.json({
       message: "Comment added successfully",
+      comment: newComment,
       commentCount: updatedPost.commentCount,
     });
   } catch (error) {
     res
       .status(400)
       .json({ message: "Error adding comment", error: error.message });
+  }
+};
+
+exports.getPostComments = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .select("comments")
+      .populate({
+        path: "comments.user",
+        select: "name profilePicture",
+      });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    res.json({ comments: post.comments });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching comments", error: error.message });
   }
 };
 
@@ -293,9 +334,6 @@ exports.getUserPostStats = async (req, res) => {
   }
 };
 
-
-
-
 exports.getFeedPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -303,24 +341,171 @@ exports.getFeedPosts = async (req, res) => {
     const skip = (page - 1) * limit; // Skips previous pages
 
     // Get the list of followed user IDs
-    
-    const followedUsers = await Follow.find({ follower: req.user.userId }).select('following'); 
-    const followedIds = followedUsers.map(f => f.following); 
+
+    const followedUsers = await Follow.find({
+      follower: req.user.userId,
+    }).select("following");
+    const followedIds = followedUsers.map((f) => f.following);
 
     // Fetch posts from followed users with pagination
-    const posts = await Post.find({ author: { $in: followedIds } }) 
-      .sort({ createdAt: -1 })  // Newest posts first
-      .skip(skip) 
-      .limit(limit)  
-      .populate('author', 'name profilePicture') // Include user details
+    const posts = await Post.find({ author: { $in: followedIds } })
+      .sort({ createdAt: -1 }) // Newest posts first
+      .skip(skip)
+      .limit(limit)
+      .populate("author", "name profilePicture") // Include user details
       .populate({
-        path: 'comments.user',
-        select: 'name profilePicture'
-      })
+        path: "comments.user",
+        select: "name profilePicture",
+      });
 
     return res.status(200).json({ success: true, posts });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Update getUserPosts to include images
+exports.getUserPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ author: req.params.userId })
+      .sort({ createdAt: -1 })
+      .select(
+        "content author sparks comments createdAt sparkCount commentCount images"
+      )
+      .populate("author", "name profilePicture")
+      .populate({
+        path: "comments.user",
+        select: "name profilePicture",
+      });
+
+    if (!posts) {
+      return res.status(404).json({ message: "No posts found" });
+    }
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// AI Gemini
+exports.generatePostContent = async (req, res) => {
+  try {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    // Get prompt from query params with fallback
+    const topic = req.query.prompt || "technology";
+    console.log("Received topic:", topic); // Debug log
+
+    const structuredPrompt = `Create an engaging social media post about ${topic}. 
+    Requirements:
+    - Keep it under 280 characters
+    - Make it engaging and contemporary
+    - Include relevant emojis
+    - Focus on the topic: ${topic}
+    - Make it sound natural and conversational`;
+
+    const result = await model.generateContent(structuredPrompt);
+    const response = await result.response;
+    const content = response.text();
+
+    const cleanContent = content.replace(/^["']|["']$/g, "").trim();
+
+    res.json({ content: cleanContent });
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    res.status(500).json({
+      message: "Error generating post content",
+      error: error.message,
+    });
+  }
+};
+
+exports.addAdvice = async (req, res) => {
+  try {
+    const { content } = req.body;
+    const userId = req.user.userId;
+    const postId = req.params.id;
+
+    const post = await Post.findById(postId).populate("author", "name");
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $push: {
+          advices: {
+            user: userId,
+            content,
+            createdAt: new Date(),
+          },
+        },
+        $inc: { adviceCount: 1 },
+      },
+      { new: true }
+    ).populate("advices.user", "name profilePicture");
+
+    // Create notification for post owner
+    if (post.author._id.toString() !== userId) {
+      await Notification.create({
+        recipient: post.author._id,
+        sender: userId,
+        type: "advice", // This should now be valid
+        message: "gave you private advice on your post",
+        target: postId,
+        targetModel: "Post",
+      });
+      // Emit real-time notification
+      emitToUser(post.author._id.toString(), "notification", {
+        type: "advice",
+        message: `Someone gave you private advice on your post`,
+        postId: postId,
+      });
+    }
+
+    res.json({
+      message: "Advice added successfully",
+      adviceCount: updatedPost.adviceCount,
+    });
+  } catch (error) {
+    console.error("Error adding advice:", error);
+    res
+      .status(400)
+      .json({ message: "Error adding advice", error: error.message });
+  }
+};
+
+exports.getAdvices = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.userId;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Only allow post owner to see advices
+    if (post.author.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view advices" });
+    }
+
+    const advices = await Post.findById(postId)
+      .select("advices")
+      .populate("advices.user", "name profilePicture");
+
+    res.json({ advices: advices.advices });
+  } catch (error) {
+    console.error("Error fetching advices:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching advices", error: error.message });
   }
 };

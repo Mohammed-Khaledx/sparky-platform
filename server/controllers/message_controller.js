@@ -17,24 +17,32 @@ const { emitToUser } = require("../socket/socket");
 const sendMessage = async (req, res) => {
   try {
     const { receiver, content } = req.body;
-    const sender = req.user.userId; // Extract from JWT
+    const sender = req.user.userId;
 
     if (!receiver || !content) {
-      return res
-        .status(400)
-        .json({ error: "Receiver ID and message are required" });
+      return res.status(400).json({ 
+        error: "Receiver ID and message content are required" 
+      });
     }
 
-    // Save message to database
-    const newMessage = await Message.create({ sender, receiver, content });
-    // getting reciver name from user table and attaching it to the message content 
-    // const user = await User.findById(sender);
+    // Create and populate the new message
+    const newMessage = await Message.create({ 
+      sender, 
+      receiver, 
+      content 
+    });
 
-    emitToUser(receiver, "message",  content, io);
-    return res.status(201).json(newMessage);
+    // Populate sender and receiver details
+    const populatedMessage = await Message.findById(newMessage._id)
+      .populate('sender', 'name profilePicture')
+      .populate('receiver', 'name profilePicture');
 
+    // Emit real-time notification
+    emitToUser(receiver, "message", populatedMessage, io);
+    
+    return res.status(201).json(populatedMessage);
   } catch (error) {
-    res.status(500).json({ error: "Failed to send message"+ error });
+    res.status(500).json({ error: "Failed to send message: " + error });
   }
 };
 
@@ -49,7 +57,10 @@ const getMessages = async (req, res) => {
         { sender: userId, receiver: otherUserId },
         { sender: otherUserId, receiver: userId },
       ],
-    }).sort({ createdAt: 1 });
+    })
+    .populate('sender', 'name profilePicture')
+    .populate('receiver', 'name profilePicture')
+    .sort({ createdAt: 1 });
 
     res.status(200).json(messages);
   } catch (error) {
@@ -57,33 +68,59 @@ const getMessages = async (req, res) => {
   }
 };
 
-// // Update message status to "seen"
-// const markMessagesAsSeen = async (req, res) => {
-//   try {
-//     const messageId = req.params;
+const getRecentMessages = async (req, res) => {
+  try {
+    const userId = req.user.userId;
 
-//     // const { sender } = req.body;
-//     // const receiver = req.user.userId;
+    // Get recent messages for the user
+    const messages = await Message.find({
+      $or: [{ sender: userId }, { receiver: userId }]
+    })
+    .sort({ createdAt: -1 })
+    .populate('sender', 'name profilePicture')
+    .populate('receiver', 'name profilePicture')
+    .limit(20);
 
-//     const message = await Message.findOne({messageId})
+    if (!messages) {
+      return res.status(200).json({ messages: [] });
+    }
 
-//     console.log(sender ,"  " , receiver )
-//     const sender = message.sender;
-//     const receiver = req.user.userId;
+    res.status(200).json({ messages });
+  } catch (error) {
+    console.error('Error fetching recent messages:', error);
+    res.status(500).json({ error: "Failed to fetch recent messages" });
+  }
+};
 
-//     await Message.updateMany(
-//       { sender, receiver, read: false },
-//       { read: true }
-//     );
+// Uncomment and fix the markMessagesAsSeen function
+const markMessagesAsSeen = async (req, res) => {
+  try {
+    const messageId = req.params.messageId;
+    const userId = req.user.userId;
 
-//     res.status(200).json({ message: "Messages marked as seen" });
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to update message status" });
-//   }
-// };
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ error: "Message not found" });
+    }
+
+    // Only mark as read if user is the receiver
+    if (message.receiver.toString() !== userId) {
+      return res.status(403).json({ error: "Not authorized to mark this message as read" });
+    }
+
+    message.read = true;
+    await message.save();
+
+    res.status(200).json({ message: "Message marked as read" });
+  } catch (error) {
+    console.error('Error marking message as read:', error);
+    res.status(500).json({ error: "Failed to mark message as read" });
+  }
+};
 
 module.exports = {
   sendMessage,
   getMessages,
-  // markMessagesAsSeen
+  getRecentMessages,
+  markMessagesAsSeen  // Make sure to export the function
 };

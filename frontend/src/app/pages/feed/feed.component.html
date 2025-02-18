@@ -1,0 +1,168 @@
+<!-- Use the new sidebar component -->
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="feed-container">
+
+      <!-- Create Post Card -->
+      <div class="create-post-card">
+        <div class="post-creator">
+          <!-- Post textarea -->
+          <textarea 
+            [ngModel]="newPost()"
+            (ngModelChange)="newPost.set($event)"
+            placeholder="What's on your mind?"
+            class="post-textarea">
+          </textarea>
+          
+          <!-- AI Generator section -->
+          <div class="ai-generator">
+            <input 
+              type="text" 
+              [ngModel]="selectedTopic()"
+              (ngModelChange)="selectedTopic.set($event)"
+              placeholder="✨ Try AI: Enter a topic..."
+              class="topic-input"
+            />
+            <button 
+              class="btn-ai" 
+              (click)="generateAIPost()"
+              [disabled]="isGenerating() || !selectedTopic()">
+              <span class="ai-icon">🪄</span>
+              <span>{{ isGenerating() ? 'Generating...' : 'Generate with AI' }}</span>
+            </button>
+          </div>
+
+          <!-- Image upload section -->
+          <div class="post-actions">
+            <div class="action-left">
+              <input 
+                type="file" 
+                id="post-images"
+                accept="image/*" 
+                multiple
+                (change)="onPostImagesSelected($event)"
+                #imageInput
+                hidden
+              >
+              <button type="button" class="btn-upload" (click)="imageInput.click()">
+                <span>📸</span>
+                <span>Add Images</span>
+              </button>
+            </div>
+            
+            <button class="btn-post" 
+              (click)="createPost()"
+              [disabled]="!newPost() || isGenerating()">
+              Post {{ selectedPostImages.length ? '(' + selectedPostImages.length + ')' : '' }}
+            </button>
+          </div>
+          
+          <!-- Image previews -->
+          <div class="image-previews" *ngIf="selectedPostImages.length > 0">
+            <div class="preview" *ngFor="let image of selectedPostImages">
+              <img [src]="image" alt="Preview">
+              <button class="remove-image" (click)="removeImage(image)">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="posts-list">
+        <div class="post-card" *ngFor="let post of posts()">
+          <!-- Post Header -->
+          <div class="post-header">
+            <img [src]="post.author.profilePicture?.url || '/assets/images/default-avatar.png'" 
+                 alt="Profile" 
+                 class="avatar"
+                 loading="lazy">
+            <div class="post-meta">
+              <strong>{{ post.author.name }}</strong>
+              <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
+            </div>
+          </div>
+          
+          <!-- Post Content -->
+          <p class="post-content">{{ post.content }}</p>
+          
+          <!-- Post Images -->
+          <div class="post-images" *ngIf="post.images?.length">
+            <div class="image-grid" [class.single]="post.images.length === 1" 
+                                  [class.multiple]="post.images.length > 1">
+              <img *ngFor="let image of post.images" 
+                   [src]="image" 
+                   alt="Post image"
+                   class="post-image"
+                   loading="lazy">
+            </div>
+          </div>
+
+          <!-- Post Actions -->
+          <div class="post-actions">
+            <button 
+              (click)="toggleSpark(post._id)" 
+              [class.sparked]="hasSparked(post._id)"
+              class="action-btn spark-btn">
+              <span class="sparkle">✨</span>
+              <span class="count">{{ postCounts()[post._id] || post.sparkCount || 0 }}</span>
+            </button>
+            
+            <button 
+              (click)="openComments(post._id)" 
+              class="action-btn comment-btn">
+              <span>💬</span>
+              <span class="count">{{ post.commentCount }}</span>
+            </button>
+
+            <!-- Show advice button only on others' posts -->
+            <button 
+              *ngIf="!isPostAuthor(post)"
+              (click)="openAdviceDialog(post._id)"
+              class="action-btn advice-btn"
+              title="Give private advice">
+              <span>🤔</span>
+              <span class="count">{{ post.adviceCount || 0 }}</span>
+            </button>
+          </div>
+
+          <!-- Comments Section -->
+          <app-comment *ngIf="selectedPostId() === post._id" 
+                      [postId]="post._id"
+                      (commentCountChanged)="updatePostCommentCount(post._id, $event)">
+          </app-comment>
+        </div>
+      </div>
+      
+      <!-- Load More Button -->
+      <button *ngIf="hasMore()" 
+              (click)="loadFeed()" 
+              [disabled]="loading()" 
+              class="load-more">
+        {{ loading() ? 'Loading...' : 'Load More' }}
+      </button>
+    </div>
+
+    <!-- Single Advice Dialog (outside the posts loop) -->
+    <div *ngIf="showAdviceDialog()" class="advice-dialog-overlay">
+      <div class="advice-dialog">
+        <h3>Give Advice</h3>
+        <textarea
+          [(ngModel)]="newAdvice"
+          placeholder="Write your advice..."
+          class="advice-input">
+        </textarea>
+        <div class="dialog-actions">
+          <button 
+            (click)="submitAdvice()"
+            [disabled]="!newAdvice().trim()"
+            class="btn btn-primary">
+            Send Advice
+          </button>
+          <button 
+            (click)="closeAdviceDialog()"
+            class="btn btn-secondary">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>

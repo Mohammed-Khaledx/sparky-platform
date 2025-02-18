@@ -1,0 +1,37 @@
+<section>
+  <h1>Discover People</h1>
+
+  <div class="members-grid">
+    @for (user of users(); track user._id) {
+      <div class="member-card">
+        <div class="member-content">
+          <div class="profile-banner"></div>
+          <div class="profile-image">
+            <img
+              [src]="
+                user.profilePicture?.url || '/assets/images/default-avatar.png'
+              "
+              [alt]="user.name"
+              loading="lazy"
+            />
+          </div>
+          <h2>{{ user.name }}</h2>
+          <p class="bio">{{ user.bio || "No bio yet" }}</p>
+        </div>
+        @if (following.includes(user._id)) {
+          <button (click)="toggleFollow(user._id)">Unfollow</button>
+        } @else {
+          <button (click)="toggleFollow(user._id)" class="follow-btn">
+            + Follow
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  @if (hasMore()) {
+    <button (click)="loadUsers()" [disabled]="loading()" class="load-more-btn">
+      {{ loading() ? "Loading..." : "Load More" }}
+    </button>
+  }
+</section>

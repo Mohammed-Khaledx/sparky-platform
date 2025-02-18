@@ -6,10 +6,6 @@
 const User = require("../models/user_model");
 const Follow = require("../models/follow_model");
 
-
-
-
-
 // for uplaod images
 const multer = require("multer");
 const path = require("path");
@@ -17,7 +13,7 @@ const fs = require("fs").promises; // For deleting files
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../uploads');
+    const uploadPath = path.join(__dirname, "../uploads");
 
     cb(null, uploadPath);
   },
@@ -46,7 +42,6 @@ const upload = multer({
   },
 });
 
-
 // CREATE
 // replaced by register
 let createUser = async (req, res) => {
@@ -62,14 +57,29 @@ let createUser = async (req, res) => {
 
 // READ
 let getAllUsers = async (req, res) => {
-  console.log("get Notes by controller throw routes finally in indexjs");
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 12;
+  const skip = (page - 1) * limit;
+
   try {
-    const users = await User.find().select("-password");
-    res.json(users);
+    const users = await User.find()
+      .select("-password -__v")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await User.countDocuments();
+    
+    res.json({
+      users,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalUsers: total
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching users",
-      error: error.message,
+      error: error.message
     });
   }
 };
@@ -93,7 +103,9 @@ let getAllUsers = async (req, res) => {
 
 let getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
+    const userId = req.params.id; // Get user ID from params
+    const user = await User.findById(userId).select("-password");
+
     if (!user) {
       return res.status(404).json({
         status: "error",
@@ -101,10 +113,9 @@ let getUserById = async (req, res) => {
       });
     }
 
-    // Fetch follow data and return the count of follwers and following
-    const followersCount = await Follow.countDocuments({ following: id });
-    const followingCount = await Follow.countDocuments({ follower: id });
-
+    // Use userId instead of undefined 'id'
+    const followersCount = await Follow.countDocuments({ following: userId });
+    const followingCount = await Follow.countDocuments({ follower: userId });
 
     res.status(200).json({
       user,
@@ -112,7 +123,7 @@ let getUserById = async (req, res) => {
       followingCount,
     });
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -139,12 +150,10 @@ let updateUser = async (req, res) => {
   }
 };
 
-
 // update profile picture
 const updateProfilePicture = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -153,13 +162,21 @@ const updateProfilePicture = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
+    // Store complete URL
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+
     if (user.profilePicture && user.profilePicture.url) {
-      // Delete previous image if it exists
-      await fs.unlink(user.profilePicture.url);
+      const oldPath = user.profilePicture.url.split("/uploads/")[1];
+      if (oldPath) {
+        await fs.unlink(path.join(__dirname, "../uploads", oldPath));
+      }
     }
 
-    user.profilePicture = { url: req.file.path };
+    user.profilePicture = { url: imageUrl };
     await user.save();
+
     res.json({
       message: "Profile picture updated",
       profilePicture: user.profilePicture,
