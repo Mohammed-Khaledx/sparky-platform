@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FeedService ,Post} from '../../services/feed.service';
 import { CommentComponent } from '../../components/comment/comment.component';
 import { NotificationService } from '../../services/notification.service';
-import { FormsModule, NgModel } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-feed',

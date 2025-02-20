@@ -1,42 +1,47 @@
 <nav class="navbar">
   <div class="logo">
     <a routerLink="/">
-      <span class="sparkle">✨</span>
-      <span class="brand-name">Sparkle</span>
+      <img src="assets/logo.png" alt="Sparky Logo" class="logo-image">
+
+      <!-- <span class="logo-icon">⚡</span> -->
+
+      <span class="brand-name">Sparky</span>
     </a>
   </div>
 
   <ul class="nav-links">
     <li>
       <a routerLink="/feed" routerLinkActive="active">
-        <span class="icon">🏠</span>
-        Feed
+        <i class="material-icons">home</i>
+        <span>Feed</span>
       </a>
     </li>
     <li *ngIf="isLoggedIn()">
       <a routerLink="/profile" routerLinkActive="active">
-        <span class="icon">👤</span>
-        Profile
+        <i class="material-icons">person</i>
+        <span>Profile</span>
       </a>
     </li>
     <li *ngIf="!isLoggedIn()">
-      <a routerLink="/auth/signin" routerLinkActive="active" class="auth-link"
-        >Login</a
-      >
+      <a routerLink="/auth/signin" routerLinkActive="active" class="auth-link">
+        <i class="material-icons">login</i>
+        <span>Login</span>
+      </a>
     </li>
     <li *ngIf="!isLoggedIn()">
-      <a routerLink="/auth/signup" routerLinkActive="active" class="signup-btn"
-        >Sign Up</a
-      >
+      <a routerLink="/auth/signup" routerLinkActive="active" class="auth-add">
+        <i class="material-icons">person_add</i>
+        <span>Sign Up</span>
+      </a>
     </li>
     <li *ngIf="isLoggedIn()">
       <button (click)="logout()" class="logout-btn">
-        <span class="icon">🚪</span>
-        Logout
+        <i class="material-icons">logout</i>
+        <span>Logout</span>
       </button>
     </li>
   </ul>
-  <button class="theme-toggle" (click)="toggleTheme()">
-    {{ isDarkTheme() ? "☀️" : "🌙" }}
+  <button class="theme-toggle glass-effect" (click)="toggleTheme()">
+    <i class="material-icons">{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</i>
   </button>
 </nav>

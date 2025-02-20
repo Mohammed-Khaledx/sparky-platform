@@ -8,18 +8,21 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common'; // Add this import
 
 @Component({
   selector: 'app-signin',
   standalone: true,
 
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule,CommonModule],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.css',
 })
 export class SigninComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  isLoading = false;
+
 
   protected loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),

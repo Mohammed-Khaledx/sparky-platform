@@ -230,7 +230,7 @@
 }
 
 .message.sent {
-  background: var(--gradient-blue);
+  background: var(--gradient-primary);
   color: white;
   align-self: flex-end;
   border-bottom-right-radius: 0.25rem;

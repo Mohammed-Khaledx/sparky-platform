@@ -72,8 +72,6 @@
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   transition: all 0.2s ease;
-  cursor: pointer;
-  position: relative;
   border: 1px solid var(--border-color);
 }
 
@@ -124,6 +122,16 @@
 .notification-time {
   font-size: 0.75rem;
   color: var(--text-tertiary);
+}
+
+.notification-badge {
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border: 2px solid var(--background-secondary);
+  box-shadow: 0 2px 8px rgba(255, 140, 66, 0.4);
 }
 
 /* Empty State */

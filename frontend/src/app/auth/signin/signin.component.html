@@ -1,19 +1,79 @@
-<div class="login-card">
-  <div class="card-title">
-    <h1>Login</h1>
-    <span
-      >You don't have an account? <a routerLink="/auth/signup">Sign up</a></span
-    >
+<!-- frontend/src/app/auth/signin/signin.component.html -->
+<div class="auth-container">
+  <div class="auth-wrapper">
+    <!-- Left side branding section -->
+    <div class="brand-section">
+      <img src="assets/logo.png" alt="Sparky Logo" class="brand-logo">
+      <h1 class="brand-title">Sparky Platform</h1>
+      <p class="brand-description">Connect, Share, and Spark Conversations</p>
+      <div class="brand-decoration">
+        <div class="floating-shapes"></div>
+      </div>
+    </div>
+
+    <!-- Right side login form -->
+    <div class="login-card glass-effect">
+      <div class="card-header">
+        <img src="assets/logo.png" alt="Sparky Logo" class="auth-logo mobile-only">
+        <h1>Welcome Back!</h1>
+        <p>Sign in to continue to Sparky</p>
+      </div>
+
+      <form class="form-group" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="input-group">
+          <i class="material-icons">email</i>
+          <input 
+            type="email" 
+            name="email" 
+            placeholder="Email Address" 
+            formControlName="email"
+            [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          />
+          <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            Please enter a valid email
+          </div>
+        </div>
+
+        <div class="input-group">
+          <i class="material-icons">lock</i>
+          <input 
+            type="password" 
+            name="password" 
+            placeholder="Password" 
+            formControlName="password"
+            [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          />
+          <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            Password is required
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-container">
+            <input type="checkbox" />
+            <span class="checkmark"></span>
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="forgot-password">Forgot Password?</a>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn-submit"
+          [disabled]="loginForm.invalid"
+        >
+          <span class="btn-content">
+            <span class="material-icons">login</span>
+            <span>Sign In</span>
+          </span>
+          <!-- <div class="spinner" ></div> -->
+        </button>
+      </form>
+
+      <div class="card-footer">
+        <span>Don't have an account?</span>
+        <a routerLink="/auth/signup" class="link-primary">Sign Up</a>
+      </div>
+    </div>
   </div>
-  <form class="form-group" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <input
-      name="email"
-      type="email"
-      formControlName="email"
-      placeholder="Email"
-    />
-    <input type="password" formControlName="password" placeholder="Password" />
-    <button>Submit</button>
-  </form>
-  <a routerLink="/auth/signup">Don't have an account? Register</a>
 </div>

@@ -8,35 +8,41 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common'; // Add this import
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule,CommonModule],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.css',
 })
 export class SignupComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  isLoading = false;
 
-  public signupForm = new FormGroup({
+  protected signupForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    terms: new FormControl(false, [Validators.requiredTrue])
   });
 
-  public onSubmit() {
+  onSubmit() {
     if (this.signupForm.valid) {
-      console.log(this.signupForm.value);
+      this.isLoading = true;
       this.authService.signup(this.signupForm.value).subscribe({
-        next: (data: any) => {
-          // this data is the response from the backend server
-          // and it has a token
-          console.log(data);
+        next: () => {
           this.router.navigate(['/auth/signin']);
         },
-        error: (err) => console.log(err),
+        error: (err) => {
+          console.error(err);
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
       });
     }
   }

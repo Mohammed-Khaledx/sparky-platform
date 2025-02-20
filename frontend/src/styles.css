@@ -1,4 +1,6 @@
 @import './styles/_themes.scss';
+@import './styles/_components.scss';
+@import './styles/_auth.scss';
 
 /* Reset & Base Styles */
 * {
@@ -7,11 +9,11 @@
   box-sizing: border-box;
 }
 
+/* Global styles */
 body {
-  background-color: var(--background-primary);
+  background: var(--background-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-primary);
   line-height: 1.5;
 }
 
@@ -39,40 +41,53 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Glass Effect */
+.glass-effect {
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
 /* Button Base Styles */
 .btn {
-  padding: 0.5rem 1rem;
-  border-radius: var(--border-radius-full);
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: var(--font-primary);
 }
 
 /* Primary Button */
 .btn-primary {
-  background: var(--button-primary-bg);
-  color: var(--button-primary-text);
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
 }
 
 .btn-primary:hover {
-  background: var(--button-primary-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
 }
 
 /* Secondary Button */
 .btn-secondary {
-  background: var(--button-secondary-bg);
-  color: var(--button-secondary-text);
+  background: var(--background-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background: var(--button-secondary-hover);
-  transform: translateY(-1px);
+  background: var(--background-hover);
+  transform: translateY(-2px);
 }
 
 /* Tertiary Button */
@@ -201,4 +216,31 @@ body {
   /* ... existing variables ... */
   --navbar-height: 64px;
   --sidebar-width: 280px;
+  /* Font */
+  --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
 }

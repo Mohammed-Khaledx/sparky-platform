@@ -1,18 +1,14 @@
-<nav class="sidebar">
+<nav class="sidebar glass-effect">
   <div class="nav-item">
     <a routerLink="/feed" routerLinkActive="active">
-      <span>🏠</span>
+      <i class="material-icons">dashboard</i>
       Feed
     </a>
   </div>
 
   <div class="nav-item">
-    <a
-      routerLink="/notifications"
-      routerLinkActive="active"
-      class="notification-link"
-    >
-      <span>🔔</span>
+    <a routerLink="/notifications" routerLinkActive="active" class="notification-link">
+      <i class="material-icons">notifications</i>
       Notifications
       <span class="notification-badge" *ngIf="unreadCount() > 0">
         {{ unreadCount() }}
@@ -22,14 +18,14 @@
 
   <div class="nav-item">
     <a routerLink="/members" routerLinkActive="active">
-      <span>👥</span>
+      <span class="material-icons">group</span>
       Members
     </a>
   </div>
 
   <div class="nav-item">
     <a routerLink="/messages" routerLinkActive="active" class="message-link">
-      <span>💬</span>
+      <span class="material-icons">chat</span>
       Messages
       <span class="message-badge" *ngIf="unreadMessageCount() > 0">
         {{ unreadMessageCount() }}
@@ -39,7 +35,7 @@
 
   <div class="nav-item">
     <a routerLink="/profile" routerLinkActive="active">
-      <span>👤</span>
+      <span class="material-icons">person</span>
       Profile
     </a>
   </div>

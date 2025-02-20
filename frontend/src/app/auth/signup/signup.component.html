@@ -1,29 +1,91 @@
-<div class="signup-card">
-  <div class="card-title">
-    <h1>Create Account</h1>
-    <span
-      >Already have an account? <a routerLink="/auth/signin">Sign In</a></span
-    >
+<div class="auth-container">
+  <div class="auth-wrapper">
+    <!-- Left side branding section -->
+    <div class="brand-section">
+      <img src="assets/logo.png" alt="Sparky Logo" class="brand-logo">
+      <h1 class="brand-title">Join Sparky Today</h1>
+      <p class="brand-description">Create, Connect, and Share Your Story</p>
+      <div class="brand-decoration">
+        <div class="floating-shapes"></div>
+      </div>
+    </div>
+
+    <!-- Right side signup form -->
+    <div class="signup-card glass-effect">
+      <div class="card-header">
+        <img src="assets/logo.png" alt="Sparky Logo" class="auth-logo mobile-only">
+        <h1>Create Account</h1>
+        <p>Join our community today!</p>
+      </div>
+
+      <form class="form-group" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <div class="input-group">
+          <i class="material-icons">person</i>
+          <input 
+            type="text" 
+            name="name" 
+            placeholder="Full Name" 
+            formControlName="name"
+            [class.error]="signupForm.get('name')?.invalid && signupForm.get('name')?.touched"
+          />
+          <div class="error-message" *ngIf="signupForm.get('name')?.invalid && signupForm.get('name')?.touched">
+            Name is required
+          </div>
+        </div>
+
+        <div class="input-group">
+          <i class="material-icons">email</i>
+          <input 
+            type="email" 
+            name="email" 
+            placeholder="Email Address" 
+            formControlName="email"
+            [class.error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+          />
+          <div class="error-message" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+            Please enter a valid email
+          </div>
+        </div>
+
+        <div class="input-group">
+          <i class="material-icons">lock</i>
+          <input 
+            type="password" 
+            name="password" 
+            placeholder="Password" 
+            formControlName="password"
+            [class.error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+          />
+          <div class="error-message" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+            Password is required
+          </div>
+        </div>
+
+        <div class="terms-section">
+          <label class="checkbox-container">
+            <input type="checkbox" formControlName="terms" />
+            <span class="checkmark"></span>
+            <span class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+          </label>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn-submit"
+          [disabled]="signupForm.invalid"
+        >
+          <span class="btn-content">
+            <span class="material-icons">person_add</span>
+            <span>Create Account</span>
+          </span>
+          <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+      </form>
+
+      <div class="card-footer">
+        <span>Already have an account?</span>
+        <a routerLink="/auth/signin" class="link-primary">Sign In</a>
+      </div>
+    </div>
   </div>
-  <form class="form-group" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-    <input type="text" name="name" placeholder="Name" formControlName="name" />
-    <input
-      type="email"
-      name="email"
-      placeholder="Email"
-      formControlName="email"
-    />
-    <input
-      type="password"
-      name="password"
-      placeholder="Password"
-      formControlName="password"
-    />
-    <input type="submit" value="Signup" />
-  </form>
-  <div class="card-terms">
-    <input type="checkbox" />
-    <span>I have read and agree to the <a href="">Terms of Service</a></span>
-  </div>
-  <a routerLink="/auth/signin">Already have an account? Login</a>
 </div>
