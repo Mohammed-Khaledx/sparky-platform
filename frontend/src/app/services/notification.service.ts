@@ -8,7 +8,9 @@ interface NotificationData {
   _id: string;
   sender: {
     name: string;
-    profilePicture?: string;
+    profilePicture:{
+      url : string
+    };
   };
   type: 'follow' | 'spark' | 'comment' | 'mention' | 'advice'; // Add 'advice' type
   message: string;

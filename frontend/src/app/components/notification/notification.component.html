@@ -13,7 +13,7 @@
            [class.unread]="!notification.isRead"
            (click)="markAsRead(notification._id)">
         <div class="notification-content">
-          <img [src]="notification.sender.profilePicture || 'assets/default-avatar.png'"
+          <img [src]="notification.sender.profilePicture?.url || 'assets/default-avatar.png'"
                alt="Profile"
                class="avatar">
           <div class="notification-text">

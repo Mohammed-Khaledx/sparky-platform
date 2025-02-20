@@ -1,12 +1,16 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../services/notification.service';
+import { User } from '../../interfaces/user';
 
 interface Notification {
   _id: string;
   sender: {
     name: string;
-    profilePicture?: string;
+    profilePicture: {
+      url: string;
+    };
+      
   };
   message: string;
   type: 'follow' | 'spark' | 'comment' | 'mention' | 'advice';
@@ -24,6 +28,8 @@ interface Notification {
 export class NotificationComponent implements OnInit {
   private notificationService = inject(NotificationService);
   notifications = signal<Notification[]>([]);
+  users = signal<User[]>([]);
+
   loading = signal(false);
   error = signal<string | null>(null);
 
