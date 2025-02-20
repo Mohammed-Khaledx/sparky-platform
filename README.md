@@ -11,7 +11,7 @@ Sparky Platform is a full-stack social networking application built with Angular
 
 🎥 **Watch the Demo:**
 
-- [YouTube](https://youtu.be/RJTGfV7cW88)
+- [YouTube]()
 
 ## Key Features
 
