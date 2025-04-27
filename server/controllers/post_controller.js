@@ -393,8 +393,14 @@ exports.getUserPosts = async (req, res) => {
 // AI Gemini
 exports.generatePostContent = async (req, res) => {
   try {
+    // Update API initialization with the correct version
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    
+    // Explicitly specify API version in model configuration
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-pro",
+      apiVersion: "v1"  // Add this line
+    });
 
     // Get prompt from query params with fallback
     const topic = req.query.prompt || "technology";

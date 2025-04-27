@@ -30,6 +30,7 @@ export class SignupComponent {
   });
 
   onSubmit() {
+    console.log(this.signupForm.value)
     if (this.signupForm.valid) {
       this.isLoading = true;
       this.authService.signup(this.signupForm.value).subscribe({

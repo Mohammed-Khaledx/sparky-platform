@@ -49,44 +49,11 @@ io.engine.on("connection_error", (err) => {
   console.log("Connection Error:", err);
 });
 
-// this is listening for the user connect from the frontend
-// io.on("connection", (socket) => {
-//   console.log("A user connected:", socket.id);
-
-//   socket.on('error', (error) => {
-//     console.error('Socket error:', error);
-//   });
-
-//   // When a user authenticates, store their socket
-//   // and this is emmited from the front end after successfull sign-in
-//   socket.on("register", (userId) => {
-//     activeUsers[userId] = socket.id;
-//     console.log("Registered user:", userId, "Socket ID:", socket.id);
-//   });
-
-//   socket.on("message", (data) => {
-//     console.log("Received:", data);
-//     socket.emit("response", `Server received: ${data}`);
-//   });
-
-//   // Handle disconnection
-//   socket.on("disconnect", () => {
-//     const userId = Object.keys(activeUsers).find(
-//       (key) => activeUsers[key] === socket.id
-//     );
-//     if (userId) {
-//       delete activeUsers[userId];
-//       console.log(`User ${userId} disconnected`);
-//     }
-//   });
-// });
-
 
 async function mongoConnect() {
   try {
-    const state = await mongoose.connect(
-      "mongodb://127.0.0.1:27017/sparky_platfrom_db"
-    );
+    // Replace hardcoded string with environment variable
+    const state = await mongoose.connect(process.env.MONGO_URI);
     console.log("db connected successfully");
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);

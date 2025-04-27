@@ -5,12 +5,14 @@ console.log("Secret Key:", process.env.JWT_SECRET); // Ensure it is not undefine
 // Generate JWT Token
 const generateToken = (userId, isAdmin) => {
   try {
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined in environment variables");
+    }
     return jwt.sign({ userId, isAdmin }, process.env.JWT_SECRET, {
-      expiresIn: "30d", // 30 daysfor testing purpose
+      expiresIn: "30d", // 30 days for testing purpose
     });
   } catch (error) {
     console.error("Token generation error:", error);
-
     throw new Error("Token generation failed");
   }
 };
