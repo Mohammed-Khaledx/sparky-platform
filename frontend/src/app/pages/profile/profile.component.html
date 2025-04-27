@@ -213,7 +213,7 @@
         <div *ngFor="let user of (showFollowers() ? followStore.followers() : followStore.following())" 
              class="user-card" 
              [class.mutual]="isUserFollowed(user._id)">
-          <img [src]="user.profilePicture?.url || '/assets/images/default-avatar.png'" 
+          <img [src]="user.profilePicture.url || '/assets/images/default-avatar.png'" 
                alt="Profile" 
                class="user-avatar">
           <div class="user-info">
