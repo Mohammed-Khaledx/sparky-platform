@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { NotificationService } from '../../services/notification.service';
+import { environment } from '../../../environments/environment';
 
 interface Advice {
   _id: string;
@@ -113,7 +114,7 @@ export class AdviceComponent implements OnInit {
   }
 
   private loadAdvices() {
-    this.http.get<{ advices: Advice[] }>(`http://localhost:3000/posts/${this.postId}/advices`)
+    this.http.get<{ advices: Advice[] }>(`${environment.apiUrl}/posts/${this.postId}/advices`)
       .subscribe({
         next: (response) => this.advices.set(response.advices),
         error: (err) => console.error('Error loading advices:', err)

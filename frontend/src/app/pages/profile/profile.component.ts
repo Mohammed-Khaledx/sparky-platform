@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import { FollowStoreService } from '../../services/follow-store.service';
 import { AdviceComponent } from '../../components/advice/advice.component';
+import { environment } from '../../../environments/environment';
 
 
 interface User {
@@ -93,7 +94,7 @@ export class ProfileComponent implements OnInit {
 
   loadProfile(userId: string) {
     this.http.get<{user: UserProfile, followersCount: number, followingCount: number}>(
-      `http://localhost:3000/users/${userId}`
+      `${environment.apiUrl}/users/${userId}`
     ).subscribe({
       next: (response) => {
         this.profile.set({
@@ -151,7 +152,7 @@ export class ProfileComponent implements OnInit {
     const formData = new FormData();
     formData.append('profilePicture', this.selectedFile);
 
-    this.http.put('http://localhost:3000/users/profile/picture', formData).subscribe({
+    this.http.put('${environment.apiUrl}/users/profile/picture', formData).subscribe({
       next: (response: any) => {
         this.profile.update(p => p ? { ...p, profilePicture: response.profilePicture.url } : null);
       },
@@ -161,7 +162,7 @@ export class ProfileComponent implements OnInit {
 
   updateProfile(formData: Partial<UserProfile>) {
     const userId = this.getUserIdFromToken();
-    this.http.patch(`http://localhost:3000/users/${userId}`, formData).subscribe({
+    this.http.patch(`${environment.apiUrl}/users/${userId}`, formData).subscribe({
       next: (response: any) => {
         this.profile.set(response);
         this.isEditing.set(false);
@@ -291,7 +292,7 @@ export class ProfileComponent implements OnInit {
     if (!userId) return;
     
     this.http.get<{ isFollowing: boolean }>(
-      `http://localhost:3000/followOrUnfollow/${userId}/status`
+      `${environment.apiUrl}/followOrUnfollow/${userId}/status`
     ).subscribe({
       next: (response) => {
         this.followStore.updateFollowStatus(userId, response.isFollowing);
@@ -324,7 +325,7 @@ export class ProfileComponent implements OnInit {
     if (!userId) return;
     
     this.http.get<{ data: any[] }>(
-      `http://localhost:3000/followOrUnfollow/${userId}?type=followers`
+      `${environment.apiUrl}/followOrUnfollow/${userId}?type=followers`
     ).subscribe({
       next: (response) => {
         const followers = response.data.map(f => f.follower);
@@ -349,7 +350,7 @@ export class ProfileComponent implements OnInit {
     if (!userId) return;
     
     this.http.get<{ data: any[] }>(
-      `http://localhost:3000/followOrUnfollow/${userId}?type=following`
+      `${environment.apiUrl}/followOrUnfollow/${userId}?type=following`
     ).subscribe({
       next: (response) => {
         const following = response.data.map(f => f.following);

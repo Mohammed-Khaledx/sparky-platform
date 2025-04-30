@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from '../../services/message.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 interface User {
   _id: string;
@@ -38,11 +39,13 @@ export class MessageComponent implements OnInit {
   recentMessageUsers = signal<User[]>([]);
   selectedUser = signal<User | null>(null);
   messages = signal<Message[]>([]);
+  private apiUrl = `${environment.apiUrl}`
   currentUserId = this.getUserIdFromToken();
   newMessage = signal(''); // Change to signal
   isFollowListOpen = signal(false);
   unreadMessages = signal<Set<string>>(new Set());
   lastMessages = signal<{ [key: string]: Message }>({});
+  
 
   ngOnInit() {
     this.loadFollowedUsers();
@@ -122,7 +125,7 @@ export class MessageComponent implements OnInit {
 
     this.http
       .get<{ data: FollowedUser[] }>(
-        `http://localhost:3000/followOrUnfollow/${userId}?type=following`
+        `${environment.apiUrl}/followOrUnfollow/${userId}?type=following`
       )
       .subscribe({
         next: (response) => {

@@ -9,7 +9,8 @@ import { Follows } from '../interfaces/follows';
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = 'http://localhost:3000/users';
+  private apiUrl = `${environment.apiUrl}/users`;
+  
 
   constructor(private http: HttpClient) {}
 
