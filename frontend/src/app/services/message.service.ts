@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, of, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { map, catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 interface Message {
   _id: string;
@@ -28,12 +29,12 @@ interface Message {
 export class MessageService {
   private http = inject(HttpClient);
   private socket: Socket;
-  private apiUrl = 'http://localhost:3000/messages';
+  private apiUrl = `${environment.apiUrl}/messages`;
   private messageSubject = new Subject<Message>();
   private unreadCount = signal(0);
 
   constructor() {
-    this.socket = io('http://localhost:3000', {
+    this.socket = io(environment.apiUrl, {
       auth: { token: localStorage.getItem('token') }
     });
 

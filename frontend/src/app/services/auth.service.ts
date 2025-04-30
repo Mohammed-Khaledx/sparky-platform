@@ -4,13 +4,14 @@ import { inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   constructor() {}
-  baseUrl = 'http://localhost:3000/users';
+  baseUrl = `${environment.apiUrl}/users`;
 
   router = inject(Router);
   httpClient = inject(HttpClient);

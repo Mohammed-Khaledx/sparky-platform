@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { io, Socket } from 'socket.io-client';
+import { environment } from '../../environments/environment';
+
 
 interface NotificationData {
   _id: string;
@@ -25,12 +27,13 @@ interface NotificationData {
 export class NotificationService {
   private socket: Socket;
   private notificationSubject = new Subject<NotificationData>();
-  private apiUrl = 'http://localhost:3000/notifications';
+  private apiUrl = `${environment.apiUrl}/notifications`;
+
   unreadCount = signal<number>(0);
   private http = inject(HttpClient)
 
   constructor() {
-    this.socket = io('http://localhost:3000', {
+    this.socket = io(environment.apiUrl, {
       auth: { token: localStorage.getItem('token') }
     });
 

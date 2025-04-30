@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, of, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Post {
   _id: string;
@@ -54,7 +55,8 @@ interface FeedResponse {
   providedIn: 'root',
 })
 export class FeedService {
-  private apiUrl = 'http://localhost:3000/posts'; // Change to your backend URL
+  private apiUrl = `${environment.apiUrl}/posts`;
+  // Change to your backend URL
   private defaultAvatar = '/assets/images/default-avatar.png';
 
   getProfileImage(profilePicture?: { url: string }) {
