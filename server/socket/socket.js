@@ -23,7 +23,7 @@ const activeUsers = new Map();
 function initializeSocket(httpServer) {
   io = new Server(httpServer, {
     cors: {
-      origin: '*',
+      origin: process.env.FRONTEND_URL || 'http://localhost:4200',
       credentials: true,
     },
   });
