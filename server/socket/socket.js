@@ -21,9 +21,14 @@ let io = null;
 const activeUsers = new Map();
 
 function initializeSocket(httpServer) {
+  const allowedOrigins = [
+    process.env.FRONTEND_URL || 'http://localhost:4200', 
+    'https://sparky-frontend-red.vercel.app'
+  ];
+
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+      origin: allowedOrigins,
       credentials: true,
     },
   });
