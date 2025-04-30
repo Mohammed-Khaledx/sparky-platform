@@ -1,6 +1,6 @@
 // src/environments/environment.prod.ts
 export const environment = {
     production: true,
-    apiUrl: 'https://your-backend-domain.vercel.app',
-    socketUrl: 'https://your-backend-domain.vercel.app'
+    apiUrl: 'sparky-platform-production.up.railway.app',
+    socketUrl: 'sparky-platform-production.up.railway.app'
   };
