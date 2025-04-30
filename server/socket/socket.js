@@ -21,14 +21,12 @@ let io = null;
 const activeUsers = new Map();
 
 function initializeSocket(httpServer) {
-   io = new Server(httpServer, {
+  io = new Server(httpServer, {
     cors: {
-      origin: "*", // the origin should be the frontend url
-      methods: ["GET", "POST"],
+      origin: '*',
       credentials: true,
     },
   });
-
   io.on("connection", (socket) => {
     // socket here is object from socket io representing the individual client connection
 

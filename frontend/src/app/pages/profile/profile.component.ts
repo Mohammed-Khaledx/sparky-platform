@@ -152,7 +152,7 @@ export class ProfileComponent implements OnInit {
     const formData = new FormData();
     formData.append('profilePicture', this.selectedFile);
 
-    this.http.put('${environment.apiUrl}/users/profile/picture', formData).subscribe({
+    this.http.put(`${environment.apiUrl}/users/profile/picture`, formData).subscribe({
       next: (response: any) => {
         this.profile.update(p => p ? { ...p, profilePicture: response.profilePicture.url } : null);
       },
