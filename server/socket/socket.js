@@ -6,8 +6,6 @@ const { Server } = require("socket.io");
 
 let io = null;
 
-
-
 // In-memory map to track active users
 // this will be a userid as a key and array of its devices socket id
 // in case he is opening from more than one device
@@ -17,21 +15,36 @@ let io = null;
 // Replace in-memory `activeUsers` with Redis for distributed and scalable user tracking.
 // Redis can store userId as the key and a list of socketIds as the value.
 
-
 const activeUsers = new Map();
 
 function initializeSocket(httpServer) {
   const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:4200', 
-    'https://sparky-frontend-red.vercel.app'
-  ];
+    'http://localhost:4200',
+    'https://sparky-frontend-red.vercel.app',
+    process.env.FRONTEND_URL
+  ].filter(Boolean); // Filter out undefined/null values
+  
+  console.log("Allowed origins for CORS:", allowedOrigins);
 
   io = new Server(httpServer, {
     cors: {
-      origin: allowedOrigins,
+      origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+          callback(null, true);
+        } else {
+          console.log(`Blocking request from origin: ${origin}`);
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"]
     },
   });
+  
   io.on("connection", (socket) => {
     // socket here is object from socket io representing the individual client connection
 
@@ -103,7 +116,6 @@ const broadcastToAll = (event, data, io) => {
     });
   });
 };
-
 
 // Add a user to the map
 const addUser = (userId, socketId) => {

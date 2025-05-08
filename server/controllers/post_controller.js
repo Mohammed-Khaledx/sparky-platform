@@ -393,11 +393,20 @@ exports.getUserPosts = async (req, res) => {
 // AI Gemini
 exports.generatePostContent = async (req, res) => {
   try {
-    // Use the current API version without specifying a version
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    // Check if API key exists
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("Missing Gemini API key - check environment variables");
+    }
     
-    // Don't specify apiVersion as the library handles this automatically
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Use explicit model configuration with safety settings
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-pro",
+      generationConfig: {
+        maxOutputTokens: 300,
+        temperature: 0.7,
+      }
+    });
 
     // Get prompt from query params with fallback
     const topic = req.query.prompt || "technology";
@@ -420,8 +429,19 @@ exports.generatePostContent = async (req, res) => {
     res.json({ content: cleanContent });
   } catch (error) {
     console.error("Gemini API Error:", error);
-    res.status(500).json({
-      message: "Error generating post content",
+    
+    // Provide more detailed error information
+    let errorMessage = "Error generating post content";
+    let statusCode = 500;
+    
+    if (error.message.includes("api key")) {
+      errorMessage = "API key issue - please check your Gemini API key";
+    } else if (error.message.includes("not found")) {
+      errorMessage = "Gemini model not found - check model name";
+    }
+    
+    res.status(statusCode).json({
+      message: errorMessage,
       error: error.message,
     });
   }

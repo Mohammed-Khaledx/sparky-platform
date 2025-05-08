@@ -19,9 +19,12 @@ app.use(express.urlencoded({ extended: true })); // For parsing form data
 require("dotenv").config();
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:4200', 
-  'https://sparky-frontend-red.vercel.app'
-];
+  'http://localhost:4200',
+  'https://sparky-frontend-red.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean); // Filter out undefined/null values
+
+console.log("Express CORS allowed origins:", allowedOrigins);
 
 app.use(cors({
   origin: function(origin, callback) {
@@ -31,6 +34,7 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log(`Express blocking request from origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
