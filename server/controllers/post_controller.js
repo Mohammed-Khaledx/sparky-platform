@@ -6,7 +6,6 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const axios = require("axios");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 const { io } = require("../index"); // Import the io instance
 const { emitToUser } = require("../socket/socket");
 
@@ -398,10 +397,12 @@ exports.generatePostContent = async (req, res) => {
       throw new Error("Missing Gemini API key - check environment variables");
     }
     
-    // Use explicit model configuration with safety settings
+    // Initialize the API with the latest version
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    
+    // Use the new model name from the curl example
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-pro",
+      model: "gemini-2.0-flash",  // Updated model name
       generationConfig: {
         maxOutputTokens: 300,
         temperature: 0.7,
@@ -412,6 +413,7 @@ exports.generatePostContent = async (req, res) => {
     const topic = req.query.prompt || "technology";
     console.log("Received topic:", topic);
 
+    // Format the prompt according to the new API
     const structuredPrompt = `Create an engaging social media post about ${topic}. 
     Requirements:
     - Keep it under 280 characters
@@ -420,9 +422,15 @@ exports.generatePostContent = async (req, res) => {
     - Focus on the topic: ${topic}
     - Make it sound natural and conversational`;
 
-    const result = await model.generateContent(structuredPrompt);
-    const response = await result.response;
-    const content = response.text();
+    // Use the new API format with contents and parts
+    const result = await model.generateContent({
+      contents: [{ 
+        parts: [{ text: structuredPrompt }]
+      }]
+    });
+    
+    // Extract the response text - API response format has changed
+    const content = result.response.text();
 
     const cleanContent = content.replace(/^["']|["']$/g, "").trim();
 
