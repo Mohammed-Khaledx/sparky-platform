@@ -34,7 +34,7 @@ export interface Comment {
   user: {
     _id: string;
     name: string;
-    profilePicture?: string;
+    profilePicture?: {url :string};
   };
   createdAt: string;
 }

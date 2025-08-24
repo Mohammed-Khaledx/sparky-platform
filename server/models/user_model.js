@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   profilePicture: { url: String }, // Path to the image file
-
   name: {
     type: String,
     required: true,

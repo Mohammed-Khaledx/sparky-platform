@@ -10,7 +10,7 @@ interface Advice {
   user: {
     _id: string;
     name: string;
-    profilePicture?: string;
+    profilePicture?: {url : string};
   };
   content: string;
   createdAt: string;
@@ -26,7 +26,7 @@ interface Advice {
       <div class="advice-list">
         <div *ngFor="let advice of advices()" class="advice-item">
           <div class="advice-header">
-            <img [src]="advice.user.profilePicture || '/assets/images/default-avatar.png'" 
+            <img [src]="advice.user.profilePicture?.url || '/assets/images/default-avatar.png'" 
                  alt="User avatar" 
                  class="advice-avatar">
             <div class="advice-meta">

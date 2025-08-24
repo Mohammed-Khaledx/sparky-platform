@@ -19,32 +19,32 @@ const activeUsers = new Map();
 
 function initializeSocket(httpServer) {
   const allowedOrigins = [
-    'http://localhost:4200',
-    'https://sparky-frontend-red.vercel.app',
-    process.env.FRONTEND_URL
+    "http://localhost:4200",
+    "https://sparky-frontend-red.vercel.app",
+    process.env.FRONTEND_URL,
   ].filter(Boolean); // Filter out undefined/null values
-  
+
   console.log("Allowed origins for CORS:", allowedOrigins);
 
   io = new Server(httpServer, {
     cors: {
-      origin: function(origin, callback) {
+      origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps)
         if (!origin) return callback(null, true);
-        
+
         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
           callback(null, true);
         } else {
           console.log(`Blocking request from origin: ${origin}`);
-          callback(new Error('Not allowed by CORS'));
+          callback(new Error("Not allowed by CORS"));
         }
       },
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"]
+      allowedHeaders: ["Content-Type", "Authorization"],
     },
   });
-  
+
   io.on("connection", (socket) => {
     // socket here is object from socket io representing the individual client connection
 
@@ -52,7 +52,7 @@ function initializeSocket(httpServer) {
 
     // Authentication middleware for socket
 
-    // The handshake property of the socket object contains information about the initial handshake that established the WebSocket connection. 
+    // The handshake property of the socket object contains information about the initial handshake that established the WebSocket connection.
     // This includes things like headers, query parameters, and authentication data.
     const token = socket.handshake.auth.token;
     let userId;
@@ -142,7 +142,7 @@ const removeUser = (socketId) => {
 // Fetch all sockets for a user
 // Using a Map provides O(1) average time complexity for lookups
 const getUserSockets = (userId) => {
-  return activeUsers.get(userId) || []
+  return activeUsers.get(userId) || [];
 };
 
 // Get all connected users

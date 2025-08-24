@@ -7,7 +7,7 @@
         <div class="member-content">
           <div class="profile-banner"></div>
           <div class="profile-image">
-            <img [src]="user.profilePicture.url || '/assets/images/default-avatar.png'" [alt]="user.name" loading="lazy" />
+            <img [src]="user.profilePicture?.url || '/assets/images/default-avatar.png'" [alt]="user.name" loading="lazy" />
           </div>
           <h2>{{ user.name }}</h2>
           <p class="bio">{{ user.bio || "No bio yet" }}</p>

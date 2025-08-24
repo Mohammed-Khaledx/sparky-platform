@@ -52,7 +52,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // For serving static files
 
-// Status route
+// Status routemodule.exports = {registerUser , loginUser}
+
 app.get("/status", (req, res) => {
   res.json({
     socketio: !!io,

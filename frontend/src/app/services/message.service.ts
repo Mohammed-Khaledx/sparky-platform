@@ -11,12 +11,12 @@ interface Message {
   sender: {
     _id: string;
     name: string;
-    profilePicture?: string;
+    profilePicture?:{url:string};
   };
   receiver: {
     _id: string;
     name: string;
-    profilePicture?: string;
+    profilePicture?: {url:string};
   };
   content: string;
   createdAt: string;

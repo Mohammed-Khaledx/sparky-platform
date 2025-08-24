@@ -85,21 +85,21 @@ let getAllUsers = async (req, res) => {
 };
 
 // not needed
-// let getUserByName = async (req, res) => {
-//   try {
-//     let name = req.params.name;
-//     const wantedUser = await User.findOne({ name: req.params.name });
-//     if (!wantedUser) {
-//       return res.status(404).json({
-//         status: "error",
-//         message: "User not found",
-//       });
-//     }
-//     res.status(200).json(wantedUser);
-//   } catch (error) {
-//     res.status(500).json(error.message);
-//   }
-// };
+let getUserByName = async (req, res) => {
+  try {
+    let name = req.params.name;
+    const wantedUser = await User.findOne({ name: req.params.name });
+    if (!wantedUser) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+    res.status(200).json(wantedUser);
+  } catch (error) {
+    res.status(500).json(error.message);
+  }
+};
 
 let getUserById = async (req, res) => {
   try {

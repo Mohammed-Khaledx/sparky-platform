@@ -12,7 +12,7 @@
           (click)="selectUser(user)"
         >
           <img
-            [src]="user.profilePicture || '/assets/images/default-avatar.png'"
+            [src]="user.profilePicture?.url || '/assets/images/default-avatar.png'"
             alt="Avatar"
             class="contact-avatar"
             loading="lazy"
@@ -48,7 +48,7 @@
           (click)="selectUser(user.following)"
         >
           <img
-            [src]="user.following.profilePicture || 'assets/default-avatar.png'"
+            [src]="user.following.profilePicture?.url || 'assets/default-avatar.png'"
             alt="Avatar"
             class="contact-avatar"
           />
@@ -62,7 +62,7 @@
   <div class="chat-area" *ngIf="selectedUser()">
     <div class="chat-header">
       <img
-        [src]="selectedUser()?.profilePicture || 'assets/default-avatar.png'"
+        [src]="selectedUser()?.profilePicture?.url || 'assets/default-avatar.png'"
         alt="Avatar"
         class="header-avatar"
       />

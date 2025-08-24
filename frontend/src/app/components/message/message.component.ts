@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 interface User {
   _id: string;
   name: string;
-  profilePicture?: string;
+  profilePicture?: {url: string} ;
 }
 
 interface FollowedUser {
@@ -17,8 +17,16 @@ interface FollowedUser {
 }
 interface Message {
   _id: string;
-  sender: User;
-  receiver: User;
+  sender: {
+    _id: string;
+    name: string;
+    profilePicture?: {url: string} ;
+  };
+  receiver: {
+    _id: string;
+    name: string;
+    profilePicture?: {url: string} ;
+  };
   content: string;
   createdAt: string;
   read: boolean;
@@ -39,9 +47,9 @@ export class MessageComponent implements OnInit {
   recentMessageUsers = signal<User[]>([]);
   selectedUser = signal<User | null>(null);
   messages = signal<Message[]>([]);
-  private apiUrl = `${environment.apiUrl}`
+  // Removed unused apiUrl variable
   currentUserId = this.getUserIdFromToken();
-  newMessage = signal(''); // Change to signal
+  newMessage = signal(''); 
   isFollowListOpen = signal(false);
   unreadMessages = signal<Set<string>>(new Set());
   lastMessages = signal<{ [key: string]: Message }>({});
@@ -52,6 +60,7 @@ export class MessageComponent implements OnInit {
     this.loadRecentMessages();
 
     this.messageService.getNewMessages().subscribe((message) => {
+      console.log(message)
       if (
         this.selectedUser()?._id === message.sender._id ||
         this.selectedUser()?._id === message.receiver._id
