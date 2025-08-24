@@ -11,7 +11,7 @@ Sparky Platform is a full-stack social networking application built with Angular
 
 🎥 **Watch the Demo:**
 
-- [YouTube](https://youtu.be/RJTGfV7cW88)
+- [YouTube](https://youtu.be/X_ffZQFldBg)
 
 ## Key Features
 
@@ -26,16 +26,11 @@ Sparky Platform is a full-stack social networking application built with Angular
 
   - Post creation with multiple image uploads
   - Comments and "sparks" (likes) system
+  - private advice for each post
   - AI-powered post generation using Google's Gemini
-  - Private messaging system
+  - Chat messaging system
   - Real-time notifications
 
-- **UI/UX**
-  - Responsive modern design
-  - Dark/Light theme support
-  - Real-time updates via WebSocket
-  - pagination for content
-  - Image preview and gallery view
 
 ## Tech Stack
 
@@ -69,9 +64,7 @@ Sparky Platform follows a modular architecture, separating concerns into distinc
 
 ### Prerequisites
 
-- Node.js (v16+)
-- MongoDB
-- Angular CLI
+
 
 ### Backend Setup
 
@@ -85,108 +78,10 @@ npm install
 npm start
 ```
 
-### Running the Server
-
-- `npm start` or `yarn start` (uses nodemon for automatic restarts during development)
-
-## API Endpoints (Examples)
-
-- `POST /users/register`: Register a new user.
-- `POST /users/login`: Log in an existing user.
-- `GET /users/:id`: Get user information.
-- `POST /posts`: Create a new post.
-- `GET /posts`: Get all posts (with pagination).
-- `POST /followOrUnfollow/:id/follow`: Follow a user.
-- `POST /followOrUnfollow/:id/unfollow`: Unfollow a user.
-- ... more
-
-(Refer to the API documentation or route files for a complete list of endpoints.)
-
-## Future Enhancements
-
-- Implement more advanced notification features (e.g., real-time updates using WebSockets).
-- Implement image/video upload functionality for posts.
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit pull requests.
-
-## Core Features Implementation
-
-### Real-time Messaging
-
-- WebSocket integration for instant messaging
-- Message read status tracking
-- Recent conversations list
-
-- Conversation history
-- Message delivery status indicators
-
-### Post Management
-
-- private advice for each post
-- Create, edit, and delete posts
-- Multiple image uploads with preview
-- AI-powered content generation with Gemini
-- Comments and reactions system
-
-### User Interactions
-
-- Follow/Unfollow system with notifications
-- Real-time activity updates
-- Profile customization options
-  - Profile picture and cover photo
-  - Bio and personal information
-    -follower / following tracking
-    -user activity and own post history
-    -fetching private advices for each post
-
-### API Documentation
-
-#### Authentication Endpoints
-
-```
-POST /users/register - Register new user
-POST /users/login - User login
-GET  /users/current - Get current user
+### Frontend Setup
+```bash
+cd frontend
+npm install
+npm start
 ```
 
-#### Posts Endpoints
-
-```
-POST /posts - Create post
-GET  /posts - Get feed posts
-PUT  /posts/:id - Update post
-POST /posts/:id/spark - Toggle spark
-POST /posts/:id/comments - Add comment
-```
-
-#### Social Endpoints
-
-```
-POST /follow/:id - Follow user
-POST /unfollow/:id - Unfollow user
-GET  /social/:id - Get followers/following
-```
-
-#### Messages Endpoints
-
-```
-POST  /messages - Send message
-GET   /messages/:userId - Get conversation
-PATCH /messages/seen/:messageId - Mark as read
-GET   /messages/recent - Get recent conversations
-```
-
-## Conclusion
-
-Sparky Platform aims to provide a modern social networking experience with:
-
-- Full-stack integration (Angular + Node.js)
-- Real-time features and AI capabilities
-- Secure user data handling
-- Scalable architecture
-
-Join our community and contribute to shaping the future of social networking!
-
-For support: [GitHub Issues](https://github.com/username/sparky-platform/issues)
